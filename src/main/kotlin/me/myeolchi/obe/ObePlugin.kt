@@ -1,25 +1,68 @@
 package me.myeolchi.obe
 
-import org.bukkit.Bukkit
-import org.bukkit.entity.Player
+import io.github.monun.kommand.getValue
+import io.github.monun.kommand.kommand
+import io.github.monun.tap.fake.FakeEntityServer
+import me.myeolchi.obe.core.CoolTimeManager
+import me.myeolchi.obe.core.SkillManager
+import me.myeolchi.obe.listeners.BaconPotato
+import me.myeolchi.obe.listeners.Gorgonzola
+import me.myeolchi.obe.listeners.Peperoni
+import me.myeolchi.obe.listeners.Shrimp
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 
-class ObePlugin: JavaPlugin() {
+class ObePlugin: JavaPlugin(), Listener {
     companion object {
         lateinit var instance: ObePlugin
             private set
 
-        val immortal = ArrayList<Player>()
+        lateinit var skillsManager: SkillManager
     }
 
-    override fun onEnable() {
-        instance = this
-        server.pluginManager.registerEvents(ObeListener(), this)
-        server.scheduler.runTaskTimer(this, FakeBodyManager::update, 0L, 1L)
+    lateinit var fakeServer: FakeEntityServer
 
-        Bukkit.getOnlinePlayers().forEach {
-            println("Joined!")
-            FakeBodyManager.join(it)
+    override fun onEnable() {
+        fakeServer = FakeEntityServer.create(this)
+        server.scheduler.runTaskTimer(this, fakeServer::update, 0, 1)
+        instance = this
+
+        skillsManager = SkillManager()
+        BaconPotato().apply()
+        Gorgonzola().apply()
+        Peperoni().apply()
+        Shrimp().apply()
+
+        kommand {
+            register("obe") {
+                then("reset") {
+                    then("id" to string().apply { suggests(CoolTimeManager.suggestions()) }) {
+                        executes {
+                            val id: String by it
+                            CoolTimeManager.reset(player, id)
+                        }
+                    }
+
+                    executes {
+                        CoolTimeManager.reset(player, null)
+                    }
+                }
+            }
         }
+
+        server.pluginManager.registerEvents(this, this)
+    }
+
+    @EventHandler
+    fun onJoin(e: PlayerJoinEvent) {
+        fakeServer.addPlayer(e.player)
+    }
+
+    @EventHandler
+    fun onQuit(e: PlayerQuitEvent) {
+        fakeServer.removePlayer(e.player)
     }
 }
