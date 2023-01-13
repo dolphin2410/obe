@@ -6,10 +6,12 @@ import io.github.monun.tap.fake.FakeEntityServer
 import me.myeolchi.obe.core.CoolTimeManager
 import me.myeolchi.obe.core.SkillManager
 import me.myeolchi.obe.listeners.*
+import me.myeolchi.obe.util.Items
 import me.myeolchi.obe.util.Sangsu
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
@@ -75,10 +77,18 @@ class ObePlugin: JavaPlugin(), Listener {
     @EventHandler
     fun onJoin(e: PlayerJoinEvent) {
         fakeServer.addPlayer(e.player)
+        if (!e.player.inventory.contains(Items.book)) {
+            e.player.inventory.addItem(Items.book)
+        }
     }
 
     @EventHandler
     fun onQuit(e: PlayerQuitEvent) {
         fakeServer.removePlayer(e.player)
+    }
+
+    @EventHandler
+    fun onDeath(e: PlayerDeathEvent) {
+        CoolTimeManager.reset(e.player, null)
     }
 }
