@@ -19,4 +19,9 @@ object EventValidator {
             item.amount -= 1
         }
     }
+
+    fun removeItem(player: Player) {
+        val item = player.inventory.itemInMainHand
+        item.amount -= 1
+    }
 }

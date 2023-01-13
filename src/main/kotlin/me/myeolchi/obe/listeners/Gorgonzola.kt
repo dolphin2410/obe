@@ -9,6 +9,7 @@ import me.myeolchi.obe.util.Items.gorgonzolaAxe
 import me.myeolchi.obe.ObePlugin
 import me.myeolchi.obe.core.Skill
 import me.myeolchi.obe.util.EventValidator
+import me.myeolchi.obe.util.Items
 import org.bukkit.GameMode
 import org.bukkit.Particle
 import org.bukkit.entity.Player
@@ -25,13 +26,14 @@ import kotlin.math.ceil
  * 유체이탈
  */
 class Gorgonzola: Listener, Skill {
+    override fun skillItem() = gorgonzolaAxe
+
     val trapped = ArrayList<Player>()
 
     @EventHandler
     fun gorgonzola(e: PlayerInteractEvent) {
         if (e.action != Action.RIGHT_CLICK_AIR && e.action != Action.RIGHT_CLICK_BLOCK) return
         if (!EventValidator.validateItem(e.player, gorgonzolaAxe)) return
-
         if (!CoolTimeManager.useItem("gorgonzola", e.player, 30 * 1000)) return
 
         val result = e.player.world.rayTraceEntities(e.player.eyeLocation, e.player.eyeLocation.direction, 20.0) { entity -> entity is Player && entity != e.player }

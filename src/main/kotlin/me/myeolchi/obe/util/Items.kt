@@ -39,4 +39,20 @@ object Items {
             it.addItemFlags(ItemFlag.HIDE_ENCHANTS)
         }
     }
+
+    val pineapplePickaxe = ItemStack(Material.IRON_PICKAXE).apply {
+        editMeta {
+            it.displayName(Component.text("Pickaxe of Pineapple", NamedTextColor.AQUA))
+            it.addEnchant(Enchantment.LUCK, 1, false)
+            it.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+        }
+    }
+
+    val bulgogiShovel = ItemStack(Material.DIAMOND_SHOVEL).apply {
+        editMeta {
+            it.displayName(Component.text("Shovel of Bulgogi", NamedTextColor.AQUA))
+            it.addEnchant(Enchantment.LUCK, 1, false)
+            it.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+        }
+    }
 }

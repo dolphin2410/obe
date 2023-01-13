@@ -4,6 +4,7 @@ import me.myeolchi.obe.core.CoolTimeManager
 import me.myeolchi.obe.util.Items.shrimpShovel
 import me.myeolchi.obe.core.Skill
 import me.myeolchi.obe.util.EventValidator
+import me.myeolchi.obe.util.Items
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -15,6 +16,8 @@ import org.bukkit.event.player.PlayerInteractEvent
  * 부비트랩
  */
 class Shrimp: Listener, Skill {
+    override fun skillItem() = shrimpShovel
+
     private val shrimps = HashMap<Player, Block>()
 
     private fun shrimpInvoke(player: Player, block: Block): Boolean {

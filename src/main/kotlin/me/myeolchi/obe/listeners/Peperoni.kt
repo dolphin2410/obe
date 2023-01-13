@@ -3,11 +3,9 @@ package me.myeolchi.obe.listeners
 import io.github.monun.heartbeat.coroutines.HeartbeatScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.myeolchi.obe.ObePlugin
 import me.myeolchi.obe.core.CoolTimeManager
-import me.myeolchi.obe.util.Items.baconPotatoHoe
-import me.myeolchi.obe.util.Items.gorgonzolaAxe
 import me.myeolchi.obe.util.Items.peperoniSword
-import me.myeolchi.obe.util.Items.shrimpShovel
 import me.myeolchi.obe.core.Skill
 import me.myeolchi.obe.util.EventValidator
 import org.bukkit.*
@@ -18,6 +16,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.Damageable
 import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.cos
@@ -27,11 +26,14 @@ import kotlin.math.sin
  * 요술 지팡이
  */
 class Peperoni: Listener, Skill {
+    override fun skillItem() = peperoniSword
+
     @EventHandler
     fun retrievePeperoni(e: PlayerInteractEvent) {
         if (e.action != Action.RIGHT_CLICK_BLOCK && e.action != Action.RIGHT_CLICK_AIR) return
         if (e.player.inventory.itemInMainHand != ItemStack(Material.IRON_SWORD)) return
         if (!CoolTimeManager.useItem("peperoni", e.player, 1 * 60 * 1000)) return
+        val item = e.player.inventory.itemInMainHand
 
         val playerDirection = e.player.eyeLocation.direction
         val initTheta = atan(playerDirection.z / playerDirection.x)
@@ -72,6 +74,7 @@ class Peperoni: Listener, Skill {
             delay(100)
 
             e.player.resetPlayerWeather()
+            if (item != e.player.inventory.itemInMainHand) return@launch
             e.player.inventory.setItemInMainHand(peperoniSword)
         }
     }
@@ -88,20 +91,18 @@ class Peperoni: Listener, Skill {
             EventValidator.damageItem(e.player, 30)
 
             if (target is Item) {
-                if (target.itemStack.type == Material.STONE_AXE && target.itemStack.amount == 1) {
-                    e.player.world.dropItemNaturally(target.location, gorgonzolaAxe)
+                ObePlugin.skillsManager.skills().forEach {
+                    if (it.skillItem().type == target.itemStack.type && target.itemStack.amount == 1) {
+                        val toGive = it.skillItem().clone()
+                        if(toGive.itemMeta is Damageable) {
+                            val dam = (target.itemStack.itemMeta as Damageable).damage
+                            toGive.apply { editMeta { d -> (d as Damageable).damage = dam } }
+                        }
+                        e.player.world.dropItemNaturally(target.location, toGive)
+                        e.player.world.strikeLightningEffect(target.location)
+                        target.remove()
+                    }
                 }
-
-                if (target.itemStack.type == Material.GOLDEN_HOE && target.itemStack.amount == 1) {
-                    e.player.world.dropItemNaturally(target.location, baconPotatoHoe)
-                }
-
-                if (target.itemStack.type == Material.IRON_SHOVEL && target.itemStack.amount == 1) {
-                    e.player.world.dropItemNaturally(target.location, shrimpShovel)
-                }
-
-                e.player.world.strikeLightningEffect(target.location)
-                target.remove()
                 return
             }
 

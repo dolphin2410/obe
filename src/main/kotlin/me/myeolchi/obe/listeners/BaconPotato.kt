@@ -15,12 +15,15 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
 class BaconPotato: Listener, Skill {
+    override fun skillItem() = baconPotatoHoe
+
     private fun selectPoints(numPoints: Int, init: Location, target: Location): List<Pair<Double, Double>> {
         val center = init.clone().add(target).multiply(0.5)
         val unitTheta = PI / numPoints
@@ -44,7 +47,7 @@ class BaconPotato: Listener, Skill {
     @EventHandler
     fun baconPotato(e: PlayerInteractEvent) {
         if (e.action != Action.RIGHT_CLICK_AIR && e.action != Action.RIGHT_CLICK_BLOCK) return
-        if (!EventValidator.validateItem(e.player, baconPotatoHoe))
+        if (!EventValidator.validateItem(e.player, baconPotatoHoe)) return
         if (!CoolTimeManager.useItem("baconPotato", e.player, 60 * 1000)) return
 
         val res = e.player.world.rayTraceBlocks(e.player.eyeLocation, e.player.eyeLocation.direction, 50.0)

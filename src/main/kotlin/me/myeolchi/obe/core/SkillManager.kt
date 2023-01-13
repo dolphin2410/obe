@@ -11,4 +11,8 @@ class SkillManager {
         Bukkit.getServer().pluginManager.registerEvents(skill as Listener, ObePlugin.instance)
         skills.add(skill)
     }
+
+    fun skills(): List<Skill> {
+        return skills
+    }
 }

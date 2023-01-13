@@ -5,10 +5,9 @@ import io.github.monun.kommand.kommand
 import io.github.monun.tap.fake.FakeEntityServer
 import me.myeolchi.obe.core.CoolTimeManager
 import me.myeolchi.obe.core.SkillManager
-import me.myeolchi.obe.listeners.BaconPotato
-import me.myeolchi.obe.listeners.Gorgonzola
-import me.myeolchi.obe.listeners.Peperoni
-import me.myeolchi.obe.listeners.Shrimp
+import me.myeolchi.obe.listeners.*
+import me.myeolchi.obe.util.Sangsu
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -31,12 +30,29 @@ class ObePlugin: JavaPlugin(), Listener {
         instance = this
 
         skillsManager = SkillManager()
+
+        Bukkit.getOnlinePlayers().forEach {
+            fakeServer.addPlayer(it)
+        }
+
         BaconPotato().apply()
         Gorgonzola().apply()
         Peperoni().apply()
         Shrimp().apply()
+        Pineapple().apply()
+        Bulgogi().apply()
 
         kommand {
+            register("sangsu") {
+                then("set") {
+                    then("sangsu" to string()) {
+                        executes {
+                            val sangsu: String by it
+                        }
+                    }
+                }
+            }
+
             register("obe") {
                 then("reset") {
                     then("id" to string().apply { suggests(CoolTimeManager.suggestions()) }) {
